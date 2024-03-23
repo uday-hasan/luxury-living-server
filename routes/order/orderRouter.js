@@ -25,13 +25,11 @@ orderRouter.post("/", async (req, res) => {
   const exist = await Order.findOne({ userId, productId });
   if (exist) {
     const product = await Service.findOne({ _id: productId });
-    return res
-      .status(403)
-      .json({
-        success: false,
-        message: "Already added in Cart",
-        data: product,
-      });
+    return res.status(403).json({
+      success: false,
+      message: "Already added in Cart",
+      data: product,
+    });
   }
   const newOrder = new Order({ userId, productId });
   await newOrder.save();
@@ -53,4 +51,10 @@ orderRouter.delete("/:userId/:productId", async (req, res) => {
     res.json({ success: true, message: "Removed from cart" });
   }
   return res.status(404).json({ success: false, message: "Not Found" });
+});
+
+orderRouter.delete("/:id", async function (req, res) {
+  const id = req?.params?.id;
+  const find = await Order.deleteMany({ userId: id });
+  res.json({ success: true });
 });

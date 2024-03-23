@@ -11,7 +11,6 @@ checkOutRouter.post("/create-payment-intent", async (req, res) => {
   if (price <= 0) {
     return res.send({ error: "error" });
   }
-  console.log(price);
   const amount = parseInt(price * 100);
   const paymentIntent = await stripe.paymentIntents.create({
     amount,
