@@ -4,22 +4,32 @@ import dotenv from "dotenv";
 dotenv.config();
 export const checkOutRouter = express.Router();
 
-const stripe = new Stripe(process.env.STRIPE_SERVER);
+const stripe = new Stripe(process.env.STRIPE_SEC_KEY);
 
-checkOutRouter.post("/create-payment-intent", async (req, res) => {
-  const { price } = req.body;
-  if (price <= 0) {
-    return res.send({ error: "error" });
-  }
-  const amount = parseInt(price * 100);
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount,
-    currency: "usd",
-    payment_method_types: ["card"],
+checkOutRouter.get("/config", async (req, res) => {
+  res.send({
+    publishableKey: process.env.STRIPE_PUB_KEY,
   });
-  res.send({ clientSecret: paymentIntent.client_secret });
 });
-
-checkOutRouter.get("/", async (req, res) => {
-  return res.json({ orders: "Hello World!" });
+checkOutRouter.post("/create-payment-intent", async (req, res) => {
+  try {
+    const amount = req.body.price;
+    console.log(amount);
+    if (amount > 0) {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount * 100,
+        currency: "usd",
+        receipt_email: "udayhasan15@gmail.com",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    }
+  } catch (err) {
+    console.log({ stripe: err });
+    res.send({ err });
+  }
 });

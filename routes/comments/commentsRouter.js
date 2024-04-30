@@ -1,10 +1,22 @@
 import express from "express";
 import { Comment } from "../../models/commentModel.js";
 
+import { verifyJWT } from "../../middleware/jwt.js";
+
 export const commentRouter = express.Router();
 
 commentRouter.get("/", async (req, res) => {
   const comments = await Comment.find({});
+  if (comments.length > 0) {
+    let newComments = comments.reverse();
+    return res.json({ data: newComments, success: true });
+  }
+  return res.json({ success: false, message: "No comments found" });
+});
+
+commentRouter.get("/:productId", async (req, res) => {
+  const id = req.params.productId;
+  const comments = await Comment.find({ productId: id });
   if (comments.length > 0) {
     let newComments = comments.reverse();
     return res.json({ data: newComments, success: true });

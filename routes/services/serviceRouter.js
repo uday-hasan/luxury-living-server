@@ -1,5 +1,6 @@
 import express from "express";
 import { Service } from "../../models/serviceModel.js";
+import { verifyJWT } from "../../middleware/jwt.js";
 export const serviceRouter = express.Router();
 
 serviceRouter.get("/", async (req, res) => {

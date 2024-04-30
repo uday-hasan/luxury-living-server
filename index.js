@@ -1,13 +1,13 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { userRouter } from "./routes/users/userRouter.js";
 import { serviceRouter } from "./routes/services/serviceRouter.js";
 import { orderRouter } from "./routes/order/orderRouter.js";
 import { checkOutRouter } from "./routes/checkout/checkoutRouter.js";
 import { commentRouter } from "./routes/comments/commentsRouter.js";
-import { confirmOrderRouter } from "./routes/confirm-order/confirmOrder.js";
 dotenv.config();
 
 const app = express();
@@ -32,9 +32,8 @@ app.get("/", (req, res) => {
 app.use("/users", userRouter);
 app.use("/services", serviceRouter);
 app.use("/order", orderRouter);
-app.use("/checkout", checkOutRouter);
+app.use("/payment", checkOutRouter);
 app.use("/comments", commentRouter);
-app.use("/confirm-order", confirmOrderRouter);
 
 app.listen(port, () => {
   console.log(`Listening on ${port} and ${url}`);

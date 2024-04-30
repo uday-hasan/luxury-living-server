@@ -2,7 +2,8 @@ import express from "express";
 import bcrypt from "bcrypt";
 import { addToDB } from "../../actions/users/addToDB.js";
 import { User } from "../../models/userModel.js";
-
+import jwt from "jsonwebtoken";
+import { verifyJWT } from "../../middleware/jwt.js";
 export const userRouter = express.Router();
 
 userRouter.get("/:email", async function (req, res) {
@@ -24,7 +25,11 @@ userRouter.post("/login/:email", async function (req, res) {
     const { password } = req.body;
     const isValidPassword = await bcrypt.compare(password, find.password);
     if (isValidPassword) {
-      return res.status(200).json({ success: true, data: find });
+      const token = await jwt.sign(
+        { email: find?.email },
+        process.env.JWT_SECRET
+      );
+      return res.status(200).json({ success: true, data: find, token });
     } else {
       return res
         .status(404)
