@@ -13,16 +13,17 @@ checkOutRouter.get("/config", async (req, res) => {
 });
 checkOutRouter.post("/create-payment-intent", async (req, res) => {
   try {
-    const amount = req.body.price;
-    console.log(amount);
-    if (amount > 0) {
+    const { orders, price } = req.body;
+    const sum = orders.reduce((s, order) => s + order.price, 0);
+    if (sum > 0) {
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100,
+        amount: sum * 100,
         currency: "usd",
-        receipt_email: "udayhasan15@gmail.com",
-        automatic_payment_methods: {
-          enabled: true,
-        },
+        payment_method_types: ["card"],
+        // payment_method_options: ["card"],
+        // automatic_payment_methods: {
+        //   enabled: true,
+        // },
       });
       res.send({
         clientSecret: paymentIntent.client_secret,
