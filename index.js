@@ -18,7 +18,9 @@ app.use(express.json());
 const url = process.env.MONGO_URL;
 const connectToDB = async () => {
   try {
-    await mongoose.connect(url);
+    await mongoose.connect(url, {
+      dbName: "luxuryLiving",
+    });
     console.log("Connect to MongoDB");
   } catch (error) {
     console.log(`Error in connectToDB: ${error}`);
