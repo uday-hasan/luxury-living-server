@@ -6,15 +6,19 @@ import jwt from "jsonwebtoken";
 import { verifyJWT } from "../../middleware/jwt.js";
 export const userRouter = express.Router();
 
-userRouter.get("/:email", async function (req, res) {
-  const email = req?.params?.email;
-  const find = await User.findOne({ email }).select("-password -__v");
-  if (find) {
-    return res.status(200).json({ success: true, data: find });
-  } else {
-    return res
-      .status(200)
-      .json({ success: false, message: "User is saving to DB " });
+userRouter.get("/:email", async function (req, res, next) {
+  try {
+    const email = req?.params?.email;
+    const find = await User.findOne({ email }).select("-password -__v");
+    if (find) {
+      return res.status(200).json({ success: true, data: find });
+    } else {
+      return res
+        .status(200)
+        .json({ success: false, message: "User is saving to DB " });
+    }
+  } catch (error) {
+    next(error);
   }
 });
 

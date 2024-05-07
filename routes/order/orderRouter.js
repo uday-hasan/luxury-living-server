@@ -1,25 +1,31 @@
 import express from "express";
 import { Order } from "../../models/orderModel.js";
 import { Service } from "../../models/serviceModel.js";
+import { verifyJWT } from "../../middleware/jwt.js";
 // import { verifyJWT } from "../../middleware/jwt.js";
 
 export const orderRouter = express.Router();
 
-orderRouter.get("/", async (req, res) => {
+orderRouter.get("/", verifyJWT, async (req, res) => {
   const orders = await Order.find({});
   return res.json({ orders });
 });
 
-orderRouter.get("/pending/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  const orders = await Order.find({ userId, status: "Pending" });
-  const productId = orders.map((product) => product.productId);
-  const services = await Service.find({});
+orderRouter.get("/pending/:userId", verifyJWT, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const headers = req.headers.authorization.split(" ")[1];
+    const orders = await Order.find({ userId, status: "Pending" });
+    const productId = orders.map((product) => product.productId);
+    const services = await Service.find({});
 
-  const data = services.filter((service) => {
-    return productId.includes(service._id.toString());
-  });
-  return res.json({ data });
+    const data = services.filter((service) => {
+      return productId.includes(service._id.toString());
+    });
+    return res.status(200).json({ data });
+  } catch (err) {
+    throw new Error(err.message);
+  }
 });
 
 orderRouter.get("/done/:userid", async (req, res) => {

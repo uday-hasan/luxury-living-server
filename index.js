@@ -28,7 +28,8 @@ const connectToDB = async () => {
 };
 connectToDB();
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  throw new Error("server");
+  // res.send("Hello World!");
 });
 
 app.use("/users", userRouter);
@@ -36,6 +37,18 @@ app.use("/services", serviceRouter);
 app.use("/order", orderRouter);
 app.use("/payment", checkOutRouter);
 app.use("/comments", commentRouter);
+
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    res.status(500).send("Headers error");
+  } else {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(500).send("Internal Server Error");
+    }
+  }
+});
 
 app.listen(port, () => {
   console.log(`Listening on ${port} and ${url}`);
